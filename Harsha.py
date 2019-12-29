@@ -8,11 +8,10 @@ import smtplib
 import mimetypes
 from email.mime.application import MIMEApplication
 import os
+impoer getpass
 import time as t
-from mutagen.mp3 import MP3
 import wikipedia
 import datetime
-import subprocess
 import pandas as pd
 from threading import Timer
 from PIL import ImageGrab
@@ -60,13 +59,6 @@ def takeCommand():
 		speak("I am sorry. Say that again please")
 		return "None"
 	return query
-"""def sendEmail(to,content):
-	server=smtplib.SMTP("smtp.gmail.com",587)
-	server.ehlo()
-	server.starttls()
-	server.login("harshavenkat17@gmail.com","Surya@123")
-	server.sendmail("harshavenkat17@gmail.com",to,content)
-	server.close()"""
 if __name__ == '__main__':
 	wishMe()
 	checkList1=["kill yourself","quit","exit","see you soon"]
@@ -89,7 +81,8 @@ if __name__ == '__main__':
 		if "what is your name" in query:
 			speak("My name is Harsha and I am a voice assistant.")
 		if "work for" in query:
-			speak("I work for Harsha Venkat.")
+			username = getpass.getuser()
+			speak("I work for %s."%username)
 		elif "paint" in query:
 			os.system('cmd /c "start ms-paint:"')
 			os.system('cmd /c "pause"')
@@ -197,10 +190,10 @@ if __name__ == '__main__':
 			strDate=datetime.datetime.now().strftime("%A %e %B %Y")
 			speak("Today is %s"%strDate)
 		elif "movie" in query:
-			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\Desktop\\Media\\Movies"')
+			os.system('cmd /c start "title" "PATH FOR MOVIES FOLDER"')
 			os.system('cmd /c "pause"')
 		elif "open songs" in query:
-			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\Desktop\\Media\\Songs"')
+			os.system('cmd /c start "title" "PATH FOR SONGS FOLDER"')
 			os.system('cmd /c "pause"')
 		elif "open vlc" in query:
 			os.system('cmd /c "C:\Program Files\VideoLAN\VLC\\vlc.exe"')
@@ -265,7 +258,7 @@ if __name__ == '__main__':
 			os.system('cmd /c "start ms-settings-bluetooth:"')
 			os.system('cmd /c "pause"')
 		elif "open screenshots" in query:
-			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\Pictures\\Screenshots"')
+			os.system('cmd /c start "title" "PATH FOR SCREENSHOTS"')
 			os.system('cmd /c "pause"')
 		elif "file" in query:
 			os.system('cmd /c "explorer"')
@@ -289,8 +282,7 @@ if __name__ == '__main__':
 			os.system('cmd /c "cls"')
 		elif "sleep" in query:
                 #go to edit power plan, click on "change advanced power settings" and change "Turn off hard disk after" "On battery and Plugged in" to "never"
-                        os.system('cmd /c "cmd /c rundll32.exe powrprof.dll,SetSuspendState 0,1,0"')
-                        speak("Welcome back.Please enter the password to turn on hibernation")     
+                        os.system('cmd /c "cmd /c rundll32.exe powrprof.dll,SetSuspendState 0,1,0"')   
 		elif "stop shutdown" in query:
 			os.system('cmd /c "shutdown /a" ')
 		elif "stop scheduled" in query:
@@ -367,11 +359,11 @@ if __name__ == '__main__':
                                                 if "shutdown" in query:
                                                         t=Timer(int(ts),lambda:os.system('cmd /c shutdown -s'))
                                                 t.start()
-                                """else:
+                                else:
                                         if "hibernate" in query:
                                              os.system('cmd /c shutdown -h'))
                                         if "shutdown" in query:
-                                             os.system('cmd /c shutdown -s'))"""  
+                                             os.system('cmd /c shutdown -s'))  
                         except Exception as e:
                              print(e)
                              speak("Sorry! Cannot hibernate")
@@ -387,7 +379,7 @@ if __name__ == '__main__':
 			snapshot = ImageGrab.grab()
 			strTime=datetime.datetime.now().strftime("%d%m%y%H%M%S")
 			SSTime="SSTimed"+strTime+".jpg"
-			SSPath = "C:\\Users\\HarshaVenkat\\Pictures\\Screenshots\\"+SSTime
+			SSPath = "PATH FOR SCREENSHOTS"+SSTime
 			snapshot.save(SSPath)
 		elif "screen" in query:
 			os.system('cmd /c "C:\\Program Files (x86)\\Bandicam\\bdcam.exe"')
@@ -400,9 +392,6 @@ if __name__ == '__main__':
 			os.system('cmd /c "pause"')
 		elif "visual studio" in query:
 			os.system('cmd /c start "title" "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\devenv.exe"')
-			os.system('cmd /c "pause"')
-		elif "latex" in query:
-			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
 			os.system('cmd /c "pause"')
 		elif ("kill" in query or "close" in query):#after "kill yourself" to close voice assistant
 			query=query.replace("kill","")
@@ -454,13 +443,11 @@ if __name__ == '__main__':
 				for i in range(eInd+1,len(qList)):
 					rcp=rcp+qList[i]
 				to_email.append(rcp)
-				#msg['To']=", ".join(to_email)
 			elif qList[eInd+1]!="to":
 				rcp=qList[eInd]
 				for i in range(eInd+1,len(qList)):
 					rcp=rcp+qList[i]
-					to_email.append(rcp)
-					#msg['To']=", ".join(to_email)
+					to_email.append(rcp)	
 			while 1:
 				speak("Are there any receipents")
 				choice=takeCommand()
@@ -470,20 +457,20 @@ if __name__ == '__main__':
 					rcp=takeCommand()
 					rcp=rcp.lower()
 					to_email.append(rcp)
+					#if the voice assistant recognises incorrectly
 					"""speak("Do you want to enter the receipent")
 					ask=takeCommand()
 					ask=ask.lower()
 					if "s" in ask:
 						rcp=input("Enter receipent:")
 					to_email.append(rcp)"""
-					#msg['To']=", ".join(to_email)
 				else:
 					break
 	#to_email has list of receipents to be verified. While checking, if not present, ask for id
 			to=""
 			print(to_email)
 			try:
-				df = pd.read_csv('C:\\Users\\HarshaVenkat\\Desktop\\Harsha\\contacts.csv')
+				df = pd.read_csv('"PATH FOR GOOGLE CONTACTS"+contacts.csv')
 				eCol= df['E-mail 1 - Value']
 				for rcp in to_email:
 					flag=0
@@ -498,13 +485,14 @@ if __name__ == '__main__':
 						to_email[to_email.index(rcp)]=to
 				print(to_email)
 				speak("Enter content")
-				content=input("Enter content: ")#####speak content, ask for any changes- pth sentence/line(both) qth word replace by
+				content=input("Enter content: ")#Can change to speak("Enter content") and then call takeCommand() 
 				msg = MIMEMultipart()
 				speak("Please tell subject")
 				msg['Subject'] = takeCommand()
 				s = smtplib.SMTP_SSL('smtp.gmail.com',465)
-				email_user="harshavenkat17@gmail.com"
-				s.login(email_user, "Surya@123")
+				email_user=#mail id of user
+				pass_user=#password of user
+				s.login(email_user, pass_user)
 				msg['From'] = email_user
 				msg['To']=", ".join(to_email)
 				txt = MIMEText(content)
@@ -538,30 +526,6 @@ if __name__ == '__main__':
 			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
 			webbrowser.get('chrome').open_new_tab(url)
 			os.system('cmd /c "pause"')
-			"""option1="no"
-			option2="yes"
-			to=""  
-			try:	
-				speak("To whom should I send?")#mail id of receiver
-				while option2=="yes":
-					newMember=("Enter mail receipent:")
-					speak("Should I send email to this receiver?")
-					option1=input("yes/no:")
-					if option1=="yes":
-						to+=newMember   # need to change for multiple receivers
-					speak("Should I send to anyone else?")
-					option2=input("yes/no:")
-					if option2=="yes":
-						to+=","
-					else:
-						break
-				speak("content please")
-				content=input("Enter content: ")
-				sendEmail(to,content)
-				speak("Email has been sent")
-			except Exception as e:
-				print(e)
-				speak("Sorry, email cannt be sent")"""
 		elif "what is" in query:
 			query=query.replace("what is","")
 			query=query.replace("a","")
