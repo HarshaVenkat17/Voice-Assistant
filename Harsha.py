@@ -8,7 +8,7 @@ import smtplib
 import mimetypes
 from email.mime.application import MIMEApplication
 import os
-impoer getpass
+import getpass
 import time as t
 import wikipedia
 import datetime
