@@ -183,8 +183,6 @@ if __name__ == '__main__':
                 
 		elif "time" in query:
 			strTime=datetime.datetime.now().strftime("%r")
-			#strTime=datetime.datetime.now().strftime("%I %M %p")
-			#speak(f"Time is {strTime}")
 			speak("Time is %s"%strTime)
 		elif "date" in query:
 			strDate=datetime.datetime.now().strftime("%A %e %B %Y")
