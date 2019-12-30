@@ -39,16 +39,16 @@ def wishMe():
 
 def takeCommand():
 	r=sr.Recognizer()
-	r.energy_threshold=800###########(a float no.)sounds below this are not considered. (Typical levels of speaking: 150-3500)
-	#r.dynamic_energy_threshold=True   ########### to adjust automatically. This takes more time. So the adjust_for_ambient_noise is used
+	r.energy_threshold=800#(a float no.)sounds below this are not considered. (Typical levels of speaking: 150-3500)
+	#r.dynamic_energy_threshold=True   # to adjust automatically. This takes more time. So the adjust_for_ambient_noise is used
 	#r.dynamic_energy_adjustment_damping = 0.15  # portion of energy retained
-	#r..dynamic_energy_adjustment_ratio = 1.5   #minimum factor by which speech is louder than ambient noise
-	#r.adjust_for_ambient_noise(source, duration = 1)   ############ method 2 for recognition 
-	#r.adjust_for_ambient_noise(source: AudioSource, duration: float = 1) -> None #######(also check)(duration atleast 0.5)
+	#r.dynamic_energy_adjustment_ratio = 1.5   #minimum factor by which speech is louder than ambient noise
+	#r.adjust_for_ambient_noise(source, duration = 1)   #method 2 for recognition 
+	#r.adjust_for_ambient_noise(source: AudioSource, duration: float = 1) -> None #(also check)(duration atleast 0.5)
 	with sr.Microphone() as source: 
-		print("Listening...")		##Note: Use all the above methods here
-		r.pause_threshold=2		#minimum length of silence (in seconds) that will register as the end of a phrase("_"?)
-		#r.operation_timeout = 1.0 # type: Union[float, None]####timeout (in seconds) for internal operations, such as API requests
+		print("Listening...")	
+		r.pause_threshold=2	#minimum length of silence (in seconds) that will register as the end of a phrase("_"?)
+		#r.operation_timeout = 1.0 # type: Union[float, None]#timeout (in seconds) for internal operations, such as API requests
 		audio=r.listen(source)
 	try:
 		print("Recognizing...")
@@ -323,15 +323,8 @@ if __name__ == '__main__':
                                                 qmInd=qMod.index("minutes")
                                         elif "minute" in query:
                                                 qmInd=qMod.index("minute")
-                                        if "seconds" in query:
-                                        #checking for "second" first and then for "seconds" can create a problem if "seconds" is in query since "second" is in "seconds"               
-                                                qsInd=qMod.index("seconds")
-                                        elif "second" in query:
-                                                qsInd=qMod.index("second") 
                                         if qmInd!=0:
                                                 mi=int(qMod[qmInd-1])
-                                        if qsInd!=0:
-                                                se=int(qMod[qsInd-1])
                                         if hr<10:
                                                 hr="0"+str(hr)
                                         if mi<10:
