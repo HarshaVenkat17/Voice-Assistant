@@ -1,4 +1,4 @@
-# python3 -m pip install <package> 
+# python3 -m pip install <package> (to install packages required)
 import pyttsx3
 import speech_recognition as sr
 import webbrowser
@@ -332,13 +332,13 @@ if __name__ == '__main__':
                                         cmdStr=str(hr)+":"+str(mi)
                                         if "hibernate at" in query:
                                                 os.system('cmd /c schtasks /create /sc once /tn "auto shutdown my computer" /tr "shutdown -h" /st %s' %cmdStr)
-                                        if "shutdown at" in query:
+                                        elif "shutdown at" in query:
                                                 os.system('cmd /c schtasks /create /sc once /tn "auto shutdown my computer" /tr "shutdown -s" /st %s' %cmdStr)
-                                        if "hibernate after" in query:
+                                        elif "hibernate after" in query:
                                                 hr=int(datetime.datetime.now().strftime("%H"))+hr
                                                 mi=int(datetime.datetime.now().strftime("%M"))+mi
                                                 os.system('cmd /c schtasks /create /sc once /tn "auto hibernate my computer" /tr "shutdown -h" /st %s' %cmdStr)
-                                        if "shutdown after" in query:
+                                        elif "shutdown after" in query:
                                                 hr=int(datetime.datetime.now().strftime("%H"))+hr
                                                 mi=int(datetime.datetime.now().strftime("%M"))+mi
                                                 os.system('cmd /c schtasks /create /sc once /tn "auto shutdown my computer" /tr "shutdown -s" /st %s' %cmdStr)
@@ -355,7 +355,7 @@ if __name__ == '__main__':
                                 else:
                                         if "hibernate" in query:
                                              os.system('cmd /c shutdown -h'))
-                                        if "shutdown" in query:
+                                        elif "shutdown" in query:
                                              os.system('cmd /c shutdown -s'))  
                         except Exception as e:
                              print(e)
