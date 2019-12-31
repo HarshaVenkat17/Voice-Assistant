@@ -15,6 +15,7 @@ import datetime
 import pandas as pd
 from threading import Timer
 from PIL import ImageGrab
+import recognise
 engine= pyttsx3.init('sapi5')
 voices= engine.getProperty('voices') 
 engine.setProperty('voice',voices[0].id)
@@ -35,7 +36,7 @@ def wishMe():
 		speak("Good Afternoon!")
 	else:
 		speak("Good Evening!")
-	speak("I am Harsha. How can I help you")#?
+	speak("How can I help you?")
 
 def takeCommand():
 	r=sr.Recognizer()
@@ -60,6 +61,15 @@ def takeCommand():
 		return "None"
 	return query
 if __name__ == '__main__':
+	cList=recognise.shoot()
+	for i in cList:
+		if " (2)" in i:
+			cList[cList.index(i)]=i.replace(" (2)","")
+	if len(cList)==0:
+		speak("Sorry Access Denied")
+		exit()
+	for i in cList:
+		speak("Hi"+i)
 	wishMe()
 	checkList1=["kill yourself","quit","exit","see you soon"]
 	checkList2=["search","wikipedia"," for ","open"]
@@ -76,8 +86,12 @@ if __name__ == '__main__':
 		query=takeCommand().lower()
 		if "how are you" in query:
 			speak("I am feeling good. Thanks!")
-		elif "who are you" in query:
-			speak("I am Harsha, speed 1.8 GigaHz, memory 8 Giga byte.")
+		if "who" in query:
+			if "i" in query or "we" in query:
+				for i in cList:
+					speak("You are"+i)
+			elif "you" in query:
+				speak("I am Harsha, speed 1.8 GigaHz, memory 8 Giga byte.")
 		if "what is your name" in query:
 			speak("My name is Harsha and I am a voice assistant.")
 		if "work for" in query:
