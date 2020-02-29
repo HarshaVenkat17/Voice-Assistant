@@ -1,5 +1,5 @@
 # Voice-Assistant
-A voice assistant to do all your work on desktop
+A voice assistant to do all your work on desktop.
 Create a folder UserIdentification to store images of all the users. Keep the folder and the 2 python files in same folder.
 If you want to run with cmd, go to that folder and run Harsha.py.
 Whenever you run the file Harsha.py, the webcam takes a photo of the person or persons infront of it and compares with the images in folder.
