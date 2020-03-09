@@ -606,8 +606,8 @@ if __name__ == '__main__':
 				speak("Please tell subject")
 				msg['Subject'] = takeCommand()
 				s = smtplib.SMTP_SSL('smtp.gmail.com',465)
-				email_user="harshavenkat17@gmail.com"#mail id of user
-				pass_user="Surya@123"#password of user
+				email_user="abc@gmail.com"#mail id of user
+				pass_user="User@123"#password of user
 				s.login(email_user, pass_user)
 				msg['From'] = email_user
 				msg['To']=", ".join(to_email)
