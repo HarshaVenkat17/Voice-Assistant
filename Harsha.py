@@ -1,4 +1,3 @@
-# python3 -m pip install <package> (to install packages required)
 import pyttsx3
 import speech_recognition as sr
 import webbrowser
@@ -63,14 +62,14 @@ def takeCommand():
 if __name__ == '__main__':
 	cList=recognise.shoot()
 	for i in cList:
-		if " (2)" in i:
-			cList[cList.index(i)]=i.replace(" (2)","")
+		if "(2)" in i:
+			cList[cList.index(i)]=i.replace("(2)","")
 	if len(cList)==0:
 		speak("Sorry Access Denied")
 		exit()
 	for i in cList:
-		speak("Hi"+i)
-	wishMe()
+		speak("Hi"+i+"Good to see you again")
+	#wishMe()
 	checkList1=["kill yourself","quit","exit","see you soon"]
 	checkList2=["search","wikipedia"," for ","open"]
 	checkList3=["search","google"," on "," for "]
@@ -82,18 +81,22 @@ if __name__ == '__main__':
 	checkList9=["hibernate at","shutdown at","hibernate after","shutdown after"]
 	checkList10=["how ","which","when","who ","why"]
 	checkList11=["search","play","watch","open"]
+	checkList12=["netflix","amazon prime","amazon","flipkart"]
 	while True:
-		query=takeCommand().lower()
+		try:
+			query=takeCommand().lower()
+		except:
+			query=input("Enter query: ")
 		if "how are you" in query:
 			speak("I am feeling good. Thanks!")
+		if "what is your name" in query:
+			speak("My name is Harsha and I am a voice assistant.")
 		if "who" in query:
 			if "i" in query or "we" in query:
 				for i in cList:
 					speak("You are"+i)
 			elif "you" in query:
 				speak("I am Harsha, speed 1.8 GigaHz, memory 8 Giga byte.")
-		if "what is your name" in query:
-			speak("My name is Harsha and I am a voice assistant.")
 		if "work for" in query:
 			username = getpass.getuser()
 			speak("I work for %s."%username)
@@ -194,7 +197,115 @@ if __name__ == '__main__':
 				print(e)
 				speak("Sorry, cannot find results")               
 		#paint is to be identified before ms since query may contain "ms"-paint
-                
+		elif ("food" in query or "order" in query):
+			if "zomato" in query:
+				url="https://www.zomato.com"
+			else:
+				url="https://www.swiggy.com/restaurants"
+			try:
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				speak("Sorry, cannot order food") 
+				print("Sorry, cannot order food due to "+e)
+		elif (("show" in query or "movie" in query) and ("book" in query or "tickets" in query)):
+			url="https://in.bookmyshow.com/"
+			try:
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				speak("Sorry, cannot book tickets") 
+				print("Sorry, cannot book tickets due to "+e)
+		elif any(c in query for c in checkList12):
+			if "amazon prime" in query:
+				url="https://www.primevideo.com/"
+			elif "amazon prime" in query:
+				url="https://www.netflix.com/"
+			elif "amazon" in query:
+				url="https://amazon.in"
+			elif ("flipkart" in query):
+				url="https://www.flipkart.com/"
+			try:
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				speak("Sorry, cannot open "+ c) 
+				print("Sorry, Cannot open "+ c +" due to "+e)
+		elif "book" in query:
+			if ("cab" in query or "car" in query or "taxi" in query):
+				url="https://www.goibibo.com/cars/"
+			elif ("bus" in query):
+				url="https://www.redbus.in/bus-tickets/"
+			elif "train" in query:
+				url="https://www.irctc.co.in/nget/train-search"
+			elif ("plane" in query):
+				url="https://www.goibibo.com/flights/"
+			try:
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				speak("Sorry for inconvinience. Cannot find your website")
+				url="https://www.makemytrip.com/"
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+		######3check location and navigation
+		elif "locat" in query:
+			query=query.replace(" in ","")
+			query=query.replace("google ","")
+			query=query.replace("maps","")
+			query=query.replace("map","")
+			try:
+				qList=query.split(" ")
+				if "locate" in query:
+					sTerm="+".join(qList[qList.index("locate")+1:])
+				elif "location" in query:
+					sTerm="+".join(qList[qList.index("location")+2:])
+				url="https://www.google.com/maps?q="+sTerm
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+			except Exception as e:
+				print("Cannot open Google maps due to "+e)
+				os.system('cmd /c "start bingmaps:"')
+			os.system('cmd /c "pause"')
+		elif "navigate" in query or "directions" in query:
+			query=query.replace(" in ","")
+			query=query.replace("google ","")
+			query=query.replace("maps","")
+			query=query.replace("map","")
+			try:
+				qList=query.split(" ")
+				if "navigate" in query:
+					sTerm="+".join(qList[qList.index("navigate")+1:])
+				elif "directions" in query:
+					sTerm="+".join(qList[qList.index("directions")+1:])
+				if "from" in query:
+					fAddr="+".join(qList[qList.index("from")+1:qList.index("to")])
+				else:
+					fAddr="My+Location"
+				if "to" in query:
+					tAddr="+".join(qList[qList.index("to")+1:])
+				url="https://www.google.com/maps?saddr=%s&daddr=%s"%(fAddr,tAddr)
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+			except Exception as e:
+				print("Cannot open Google maps due to "+e)
+				os.system('cmd /c "start bingmaps:"')
+			os.system('cmd /c "pause"')
+		elif "map" in query:
+			os.system('cmd /c "start bingmaps:"')
+			os.system('cmd /c "pause"')
 		elif "time" in query:
 			strTime=datetime.datetime.now().strftime("%r")
 			speak("Time is %s"%strTime)
@@ -368,7 +479,7 @@ if __name__ == '__main__':
                                         if "hibernate" in query:
                                              os.system('cmd /c shutdown -h')
                                         elif "shutdown" in query:
-                                             os.system('cmd /c shutdown -s') 
+                                             os.system('cmd /c shutdown -s')
                         except Exception as e:
                              print(e)
                              speak("Sorry! Cannot hibernate")
@@ -495,8 +606,8 @@ if __name__ == '__main__':
 				speak("Please tell subject")
 				msg['Subject'] = takeCommand()
 				s = smtplib.SMTP_SSL('smtp.gmail.com',465)
-				email_user=#mail id of user
-				pass_user=#password of user
+				email_user="harshavenkat17@gmail.com"#mail id of user
+				pass_user="Surya@123"#password of user
 				s.login(email_user, pass_user)
 				msg['From'] = email_user
 				msg['To']=", ".join(to_email)
