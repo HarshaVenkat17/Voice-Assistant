@@ -1,3 +1,4 @@
+# python3 -m pip install <package> 
 import pyttsx3
 import speech_recognition as sr
 import webbrowser
@@ -59,16 +60,20 @@ def takeCommand():
 		speak("I am sorry. Say that again please")
 		return "None"
 	return query
+
 if __name__ == '__main__':
-	cList=recognise.shoot()
+	try:
+		cList=recognise.shoot()
+	except:
+		cList=recognise.shoot()
 	for i in cList:
 		if "(2)" in i:
 			cList[cList.index(i)]=i.replace("(2)","")
 	if len(cList)==0:
-		speak("Sorry Access Denied")
+		speak("Sorry, Access Denied")
 		exit()
 	for i in cList:
-		speak("Hi"+i+"Good to see you again")
+		speak("Hi"+i+"Good to see you again. How can I help you?")
 	#wishMe()
 	checkList1=["kill yourself","quit","exit","see you soon"]
 	checkList2=["search","wikipedia"," for ","open"]
@@ -103,7 +108,7 @@ if __name__ == '__main__':
 		elif "paint" in query:
 			os.system('cmd /c "start ms-paint:"')
 			os.system('cmd /c "pause"')
-		elif ("microsoft" in query or "ms" in query):
+		elif (("microsoft" in query or "ms" in query) and "online" in query):
 			try:
 				if "word" in query:
 					sStr="https://office.live.com/start/Word.aspx"
@@ -327,6 +332,12 @@ if __name__ == '__main__':
 		elif "alarm" in query:
 			os.system('cmd /c "start ms-clock:"')	
 			os.system('cmd /c "pause"')
+		elif "stopwatch" in query:
+			os.system('cmd /c "start ms-clock:"')	
+			os.system('cmd /c "pause"')
+		elif "timer" in query:
+			os.system('cmd /c "start ms-clock:"')	
+			os.system('cmd /c "pause"')
 		elif "wifi" in query:
 			os.system('cmd /c "start ms-availablenetworks:"')	
 			os.system('cmd /c "pause"')
@@ -335,6 +346,9 @@ if __name__ == '__main__':
 			os.system('cmd /c "pause"')
 		elif "calendar" in query:
 			os.system('cmd /c "start outlookcal:"')	
+			os.system('cmd /c "pause"')
+		elif "photo" in query or "pictures" in query:
+			os.system('cmd /c "start ms-photos:"')
 			os.system('cmd /c "pause"')
 		elif any(c in query for c in checkList4):
 			os.system('cmd /c "start microsoft.windows.camera:"')	
@@ -346,24 +360,28 @@ if __name__ == '__main__':
 		elif "cortana" in query:
 			os.system('cmd /c "start ms-cortana:"')	
 			os.system('cmd /c "pause"')
-		elif "calculator" in query:
+		elif "calculat" in query:
 			os.system('cmd /c "start calculator"') #can remove all cmd,cmd/k,cmd /c k,c,....
-			os.system('cmd /c "pause"')
-		elif "map" in query:
-			os.system('cmd /c "start bingmaps:"')
-			os.system('cmd /c "pause"')
-		
+			os.system('cmd /c "pause"')		
 		elif "edge" in query:
 			os.system('cmd /c "start microsoft-edge:"')
 			os.system('cmd /c "pause"')
+		elif "sports" in query:
+			try:
+				url="https://timesofindia.indiatimes.com/sports"
+				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+				webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+				webbrowser.get('chrome').open_new_tab(url)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				print(e)
+				speak("Sorry, cannot find anything. Try searching the news.")
+			
 		elif "news" in query:
 			os.system('cmd /c "start bingnews:"')
 			os.system('cmd /c "pause"')
 		elif "voice" in query:
 			os.system('cmd /c "start ms-callrecording:"')
-			os.system('cmd /c "pause"')
-		elif "photo" in query:
-			os.system('cmd /c "start ms-photos:"')
 			os.system('cmd /c "pause"')
 		elif "settings" in query:
 			os.system('cmd /c "start ms-settings:"')
@@ -497,6 +515,24 @@ if __name__ == '__main__':
 			SSTime="SSTimed"+strTime+".jpg"
 			SSPath = "PATH FOR SCREENSHOTS"+SSTime
 			snapshot.save(SSPath)
+		elif "note" in query:
+			if "take" in query or "write" in query:
+				content=""
+				speak("Do you want to speak content")
+				ask=takeCommand().lower()
+				if "s" in ask:
+					content=takeCommand()
+				else:
+					speak("Enter content")
+					content=input("Enter content:")
+				f = open('note.txt','a')
+				f.write(content+'\n')
+				f.close()			
+			elif "open" in query or "read" in query:
+				f = open('note.txt','r')
+				s=f.read()
+				print(s)
+				f.close()
 		elif "screen" in query:
 			os.system('cmd /c "C:\\Program Files (x86)\\Bandicam\\bdcam.exe"')
 			os.system('cmd /c "pause"')
@@ -509,6 +545,9 @@ if __name__ == '__main__':
 		elif "visual studio" in query:
 			os.system('cmd /c start "title" "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\devenv.exe"')
 			os.system('cmd /c "pause"')
+		elif "latex" in query:
+			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
+			os.system('cmd /c "pause"')			
 		elif ("kill" in query or "close" in query):#after "kill yourself" to close voice assistant
 			query=query.replace("kill","")
 			query=query.replace("task","")
@@ -563,7 +602,9 @@ if __name__ == '__main__':
 				rcp=qList[eInd]
 				for i in range(eInd+1,len(qList)):
 					rcp=rcp+qList[i]
-					to_email.append(rcp)	
+					to_email.append(rcp)
+			else:
+				break
 			while 1:
 				speak("Are there any receipents")
 				choice=takeCommand()
@@ -606,8 +647,8 @@ if __name__ == '__main__':
 				speak("Please tell subject")
 				msg['Subject'] = takeCommand()
 				s = smtplib.SMTP_SSL('smtp.gmail.com',465)
-				email_user="abc@gmail.com"#mail id of user
-				pass_user="User@123"#password of user
+				email_user="harshavenkat17@gmail.com"#mail id of user
+				pass_user="Surya@123"#password of user
 				s.login(email_user, pass_user)
 				msg['From'] = email_user
 				msg['To']=", ".join(to_email)
@@ -643,8 +684,13 @@ if __name__ == '__main__':
 			webbrowser.get('chrome').open_new_tab(url)
 			os.system('cmd /c "pause"')
 		elif "what is" in query:
-			query=query.replace("what is","")
-			query=query.replace("a","")
+			query=query.replace(query,query[query.index("what is "):])
+			webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % query)
+			os.system('cmd /c "pause"')
+		elif "tell" in query:
+			rList=["tell me about", "tell about","tell me"]
+			if any(c in query for c in rList):
+				query=query.split(c)[1]
 			webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % query)
 			os.system('cmd /c "pause"')
 		elif any(c in query for c in checkList10):
