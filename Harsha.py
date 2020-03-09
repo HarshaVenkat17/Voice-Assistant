@@ -366,9 +366,9 @@ if __name__ == '__main__':
                                                 t.start()
                                 else:
                                         if "hibernate" in query:
-                                             os.system('cmd /c shutdown -h'))
+                                             os.system('cmd /c shutdown -h')
                                         elif "shutdown" in query:
-                                             os.system('cmd /c shutdown -s'))  
+                                             os.system('cmd /c shutdown -s') 
                         except Exception as e:
                              print(e)
                              speak("Sorry! Cannot hibernate")
