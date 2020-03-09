@@ -16,6 +16,12 @@ import pandas as pd
 from threading import Timer
 from PIL import ImageGrab
 import recognise
+import re
+import string
+from pyowm import OWM
+import json
+from bs4 import BeautifulSoup as soup
+from urllib.request import urlopen
 engine= pyttsx3.init('sapi5')
 voices= engine.getProperty('voices') 
 engine.setProperty('voice',voices[0].id)
@@ -73,7 +79,7 @@ if __name__ == '__main__':
 		speak("Sorry, Access Denied")
 		exit()
 	for i in cList:
-		speak("Hi"+i+"Good to see you again. How can I help you?")
+		speak("Hi"+i+". Good to see you again. How can I help you?")
 	#wishMe()
 	checkList1=["kill yourself","quit","exit","see you soon"]
 	checkList2=["search","wikipedia"," for ","open"]
@@ -314,7 +320,7 @@ if __name__ == '__main__':
 		elif "time" in query:
 			strTime=datetime.datetime.now().strftime("%r")
 			speak("Time is %s"%strTime)
-		elif "date" in query:
+		elif " date " in query:
 			strDate=datetime.datetime.now().strftime("%A %e %B %Y")
 			speak("Today is %s"%strDate)
 		elif "movie" in query:
@@ -376,9 +382,24 @@ if __name__ == '__main__':
 			except Exception as e:
 				print(e)
 				speak("Sorry, cannot find anything. Try searching the news.")
-			
+				os.system('cmd /c "start bingnews:"')
+				os.system('cmd /c "pause"')
 		elif "news" in query:
 			os.system('cmd /c "start bingnews:"')
+			news_url="https://news.google.com/news/rss"
+			Client=urlopen(news_url)
+			xml_page=Client.read()
+			Client.close()
+			soup_page=soup(xml_page,"xml")
+			news_list=soup_page.findAll("item")
+			# Print news title, url and publish date
+			for news in news_list[:10]:
+				c="".join(x for x in news.title.text if x in string.printable)
+				print (c)
+				print(news.pubDate.text)
+				speak(c)
+				print("Link: "+news.link.text)
+				print("-"*60)
 			os.system('cmd /c "pause"')
 		elif "voice" in query:
 			os.system('cmd /c "start ms-callrecording:"')
@@ -386,9 +407,28 @@ if __name__ == '__main__':
 		elif "settings" in query:
 			os.system('cmd /c "start ms-settings:"')
 			os.system('cmd /c "pause"')
-		elif "weather" in query:
-			os.system('cmd /c "start bingweather:"')
-			os.system('cmd /c "pause"')
+		elif ("weather" in query or "temperature" in query) :
+			try:
+				if " in " in query:
+					query=query.replace(query,query[query.index(" in ")+4:])
+				else:
+					with urlopen("https://geolocation-db.com/json") as url:
+						data = json.loads(url.read().decode())
+						query=data['city']
+				command="what is the current weather in "+query
+				reg_ex = re.search('current weather in (.*)', command)
+				if reg_ex:
+					city = reg_ex.group(1)
+					owm = OWM(API_key='ab0d5e80e8dafb2cb81fa9e82431c1fa')
+					obs = owm.weather_at_place(city)
+					w = obs.get_weather()
+					k = w.get_status()
+					x = w.get_temperature(unit='celsius')
+					print('Current weather in %s is %s. The maximum temperature is %0.2f and the minimum temperature is %0.2f degree celcius' % (city, k, x['temp_max'], x['temp_min']))
+					speak('Current weather in %s is %s. The maximum temperature is %0.2f and the minimum temperature is %0.2f degree celcius' % (city, k, x['temp_max'], x['temp_min']))
+			except:
+				os.system('cmd /c "start bingweather:"')
+				os.system('cmd /c "pause"')
 		elif "shareit" in query:
 			os.system('cmd /c "C:\Program Files (x86)\SHAREit Technologies\SHAREit\SHAREit.exe"')
 			os.system('cmd /c "pause"')
@@ -546,7 +586,7 @@ if __name__ == '__main__':
 			os.system('cmd /c start "title" "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\devenv.exe"')
 			os.system('cmd /c "pause"')
 		elif "latex" in query:
-			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
+			os.system('cmd /c start "title" "C:\\Users\\Username\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
 			os.system('cmd /c "pause"')			
 		elif ("kill" in query or "close" in query):#after "kill yourself" to close voice assistant
 			query=query.replace("kill","")
@@ -647,8 +687,8 @@ if __name__ == '__main__':
 				speak("Please tell subject")
 				msg['Subject'] = takeCommand()
 				s = smtplib.SMTP_SSL('smtp.gmail.com',465)
-				email_user="harshavenkat17@gmail.com"#mail id of user
-				pass_user="Surya@123"#password of user
+				email_user="abc@gmail.com"#mail id of user
+				pass_user="abc@123"#password of user
 				s.login(email_user, pass_user)
 				msg['From'] = email_user
 				msg['To']=", ".join(to_email)
@@ -704,3 +744,4 @@ if __name__ == '__main__':
 				webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % c)
 				os.system('cmd /c "pause"')
 	speak("Thanks for visiting.")
+#written by harsha
