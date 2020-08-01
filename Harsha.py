@@ -9,11 +9,13 @@ import mimetypes
 from email.mime.application import MIMEApplication
 import os
 import getpass
-import time as t
+#import time as t
+import time
 import wikipedia
 import datetime
 import pandas as pd
-from threading import Timer
+import threading as thr
+from multiprocessing import Process
 from PIL import ImageGrab
 import recognise
 import re
@@ -22,6 +24,8 @@ from pyowm import OWM
 import json
 from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen
+from plyer import notification
+import schedule
 engine= pyttsx3.init('sapi5')
 voices= engine.getProperty('voices') 
 engine.setProperty('voice',voices[0].id)
@@ -54,7 +58,7 @@ def takeCommand():
 	#r.adjust_for_ambient_noise(source: AudioSource, duration: float = 1) -> None #(also check)(duration atleast 0.5)
 	with sr.Microphone() as source: 
 		print("Listening...")	
-		r.pause_threshold=2	#minimum length of silence (in seconds) that will register as the end of a phrase("_"?)
+		r.pause_threshold=2	#minimum length of silence (in seconds) that will register as the end of a phrase
 		#r.operation_timeout = 1.0 # type: Union[float, None]#timeout (in seconds) for internal operations, such as API requests
 		audio=r.listen(source)
 	try:
@@ -67,20 +71,39 @@ def takeCommand():
 		return "None"
 	return query
 
-if __name__ == '__main__':
-	try:
-		cList=recognise.shoot()
-	except:
-		cList=recognise.shoot()
-	for i in cList:
-		if "(2)" in i:
-			cList[cList.index(i)]=i.replace("(2)","")
-	if len(cList)==0:
-		speak("Sorry, Access Denied")
-		exit()
-	for i in cList:
-		speak("Hi"+i+". Good to see you again. How can I help you?")
-	#wishMe()
+def job():
+	global ct
+	ct+=1
+	hrs=ct//4
+	mnt=ct%4
+	if mnt!=0:
+		if hrs==1:
+			msg="Running for "+str(hrs)+" hour "+ str(15*mnt)+" minutes..."
+		else:
+			msg="Running for "+str(hrs)+" hours "+ str(15*mnt)+" minutes..."
+		notification.notify(
+            title="15 minutes reminder",
+            message=msg,
+            timeout=5
+            )
+	else:
+		if hrs==1:
+			msg="Running for 1 hour..."
+		else:
+			msg="Running for "+str(hrs)+" hours..."
+		notification.notify(
+            title="1 hour reminder",
+            message=msg,
+            timeout=5
+            )
+def call():
+	global ct
+	ct=0
+	schedule.every(1).minutes.do(job)
+	while True:
+		schedule.run_pending()
+
+def VA():
 	checkList1=["kill yourself","quit","exit","see you soon"]
 	checkList2=["search","wikipedia"," for ","open"]
 	checkList3=["search","google"," on "," for "]
@@ -93,6 +116,7 @@ if __name__ == '__main__':
 	checkList10=["how ","which","when","who ","why"]
 	checkList11=["search","play","watch","open"]
 	checkList12=["netflix","amazon prime","amazon","flipkart"]
+	checkList13=["drive","google doc","slide","sheet","hangout","photo","duo","meet"]
 	while True:
 		try:
 			query=takeCommand().lower()
@@ -100,19 +124,38 @@ if __name__ == '__main__':
 			query=input("Enter query: ")
 		if "how are you" in query:
 			speak("I am feeling good. Thanks!")
-		if "what is your name" in query:
+		elif "what is your name" in query:
 			speak("My name is Harsha and I am a voice assistant.")
-		if "who" in query:
+
+		elif "who" in query:
 			if "i" in query or "we" in query:
 				for i in cList:
 					speak("You are"+i)
 			elif "you" in query:
 				speak("I am Harsha, speed 1.8 GigaHz, memory 8 Giga byte.")
-		if "work for" in query:
+		elif "work for" in query:
 			username = getpass.getuser()
 			speak("I work for %s."%username)
 		elif "paint" in query:
 			os.system('cmd /c "start ms-paint:"')
+			os.system('cmd /c "pause"')
+		elif "skype" in query:
+			url="https://web.skype.com/"
+			chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+			webbrowser.get('chrome').open_new_tab(url)
+			os.system('cmd /c "pause"')
+		elif("outlook" in query):
+			url="https://outlook.live.com/mail/0/inbox1"
+			chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+			webbrowser.get('chrome').open_new_tab(url)
+			os.system('cmd /c "pause"')
+		elif (("one drive" in query) or ("onedrive" in query)):
+			url="https://onedrive.live.com/"
+			chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+			webbrowser.get('chrome').open_new_tab(url)
 			os.system('cmd /c "pause"')
 		elif (("microsoft" in query or "ms" in query) and "online" in query):
 			try:
@@ -120,8 +163,8 @@ if __name__ == '__main__':
 					sStr="https://office.live.com/start/Word.aspx"
 				elif "excel" in query:
 					sStr="https://office.live.com/start/Excel.aspx"
-				elif "powerpoint" in query:
-					sStr="https://office.live.com/start/Powerpoint.aspx"   
+				elif (("powerpoint" in query) or ("presentation" in query)):
+					sStr="https://office.live.com/start/Powerpoint.aspx" 
 			except Exception as e:
 				speak("Sorry, cannot open!")
 				print(e)
@@ -160,14 +203,33 @@ if __name__ == '__main__':
 			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
 			webbrowser.get('chrome').open_new_tab(url)
 			os.system('cmd /c "pause"')
+		elif ("google" in query and any(c in query for c in checkList13)):
+			if "slide" in query:
+				url="https://docs.google.com/presentation/"
+			elif "hangout" in query:
+				url="https://hangouts.google.com/"
+			elif "sheet" in query:
+				url="https://docs.google.com/spreadsheets/"
+			elif "doc" in query:
+				url="https://docs.google.com/document/"
+			elif "photo" in query:
+				url="https://photos.google.com";
+			elif "duo" in query:
+				url="https://duo.google.com/"
+			elif "drive" in query:
+				url="https://drive.google.com/drive/u/0/my-drive"
+			elif "meet" in query:
+				url="https://meet.google.com/"
+			else:
+				url="https://www.youtube.com/"
+			chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+			webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path),1)
+			webbrowser.get('chrome').open_new_tab(url)
+			os.system('cmd /c "pause"')
 		elif "open google" in query:
 			os.system('cmd /c start "title" /MAX "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"')
 			os.system('cmd /c "pause"')
-		elif ("google for" in query or "search for" in query):#"search for" before "what is"
-			query=query.replace("search for","")
-			query=query.replace("google for","")
-			webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % query)
-			os.system('cmd /c "pause"')
+		
 		elif "google with url" in query:
 			chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
 			try:
@@ -187,7 +249,24 @@ if __name__ == '__main__':
 				os.system('cmd /c "pause"')
 			except Exception as e:
 				speak("Sorry, cannot find results")
-				print(e)     
+				print(e)
+		elif "search google" in query:
+			try:
+				speak(" What should I search for?")
+				sTerm=takeCommand().lower()
+				webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % sTerm)
+				os.system('cmd /c "pause"')
+			except Exception as e:
+				print(e)
+				speak("Sorry, cannot find results")   
+
+		elif ("google" in query or "search" in query):#"search for" before "what is"
+			query=query.replace("search for ","")
+			query=query.replace("search ","")
+			query=query.replace("google for","")
+			query=query.replace("in google","")
+			webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % query)
+			os.system('cmd /c "pause"')
 		elif "whatsapp" in query:
 			try:
 				url="https://web.whatsapp.com"
@@ -198,17 +277,8 @@ if __name__ == '__main__':
 			except Exception as e:
 				speak("Sorry, cannot open WhatsApp")
 				print(e)   
-		elif "search google" in query:
-			try:
-				speak(" What should I search for?")
-				sTerm=takeCommand().lower()
-				webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % sTerm)
-				os.system('cmd /c "pause"')
-			except Exception as e:
-				print(e)
-				speak("Sorry, cannot find results")               
 		#paint is to be identified before ms since query may contain "ms"-paint
-		elif ("food" in query or "order" in query):
+		elif ("order food" in query or "zomato" in query or "swiggy" in query):
 			if "zomato" in query:
 				url="https://www.zomato.com"
 			else:
@@ -221,7 +291,7 @@ if __name__ == '__main__':
 			except Exception as e:
 				speak("Sorry, cannot order food") 
 				print("Sorry, cannot order food due to "+e)
-		elif (("show" in query or "movie" in query) and ("book" in query or "tickets" in query)):
+		elif (("show" in query or "movie" in query) and ("book" in query or "ticket" in query)):
 			url="https://in.bookmyshow.com/"
 			try:
 				chrome_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" 
@@ -234,10 +304,10 @@ if __name__ == '__main__':
 		elif any(c in query for c in checkList12):
 			if "amazon prime" in query:
 				url="https://www.primevideo.com/"
-			elif "amazon prime" in query:
+			elif "netflix" in query:
 				url="https://www.netflix.com/"
 			elif "amazon" in query:
-				url="https://amazon.in"
+				url="https://www.amazon.in"
 			elif ("flipkart" in query):
 				url="https://www.flipkart.com/"
 			try:
@@ -314,7 +384,7 @@ if __name__ == '__main__':
 				print("Cannot open Google maps due to "+e)
 				os.system('cmd /c "start bingmaps:"')
 			os.system('cmd /c "pause"')
-		elif "map" in query:
+		elif " map" in query:
 			os.system('cmd /c "start bingmaps:"')
 			os.system('cmd /c "pause"')
 		elif "time" in query:
@@ -529,9 +599,9 @@ if __name__ == '__main__':
                                                 ts=ts.replace("seconds","")
                                                 ts=ts.replace("second","")
                                                 if "hibernate" in query:
-                                                        t=Timer(int(ts),lambda:os.system('cmd /c shutdown -h'))
+                                                        t=thr.Timer(int(ts),lambda:os.system('cmd /c shutdown -h'))
                                                 if "shutdown" in query:
-                                                        t=Timer(int(ts),lambda:os.system('cmd /c shutdown -s'))
+                                                        t=thr.Timer(int(ts),lambda:os.system('cmd /c shutdown -s'))
                                                 t.start()
                                 else:
                                         if "hibernate" in query:
@@ -573,7 +643,7 @@ if __name__ == '__main__':
 				s=f.read()
 				print(s)
 				f.close()
-		elif "screen" in query:
+		elif("screen" in query and "record" in query):
 			os.system('cmd /c "C:\\Program Files (x86)\\Bandicam\\bdcam.exe"')
 			os.system('cmd /c "pause"')
 		elif "code blocks" in query:
@@ -586,7 +656,7 @@ if __name__ == '__main__':
 			os.system('cmd /c start "title" "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\devenv.exe"')
 			os.system('cmd /c "pause"')
 		elif "latex" in query:
-			os.system('cmd /c start "title" "C:\\Users\\Username\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
+			os.system('cmd /c start "title" "C:\\Users\\HarshaVenkat\\AppData\\Local\\Programs\\MiKTeX 2.9\\miktex\\bin\\x64\\miktex-texworks.exe"')
 			os.system('cmd /c "pause"')			
 		elif ("kill" in query or "close" in query):#after "kill yourself" to close voice assistant
 			query=query.replace("kill","")
@@ -667,7 +737,7 @@ if __name__ == '__main__':
 			to=""
 			print(to_email)
 			try:
-				df = pd.read_csv('"PATH FOR GOOGLE CONTACTS"+contacts.csv')
+				df = pd.read_csv('"C:\\Users\\HarshaVenkat\\Desktop\\Extras\\Harsha\\"+contacts.csv')
 				eCol= df['E-mail 1 - Value']
 				for rcp in to_email:
 					flag=0
@@ -724,7 +794,7 @@ if __name__ == '__main__':
 			webbrowser.get('chrome').open_new_tab(url)
 			os.system('cmd /c "pause"')
 		elif "what is" in query:
-			query=query.replace(query,query[query.index("what is "):])
+			query=query.replace("what is ","")
 			webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % query)
 			os.system('cmd /c "pause"')
 		elif "tell" in query:
@@ -738,10 +808,33 @@ if __name__ == '__main__':
 			os.system('cmd /c "pause"')
 		elif "open" in query:
 			c=query.replace("open","")
-			speak("Sorry! I don't have your query in my database Do you want me to search in google")
+			speak("Sorry! I don't have your query in my database. Do you want me to search in google")
 			query=takeCommand().lower()
 			if "s" in query:
 				webbrowser.open_new_tab('http://www.google.com/search?btnG=1&q=%s' % c)
 				os.system('cmd /c "pause"')
 	speak("Thanks for visiting.")
-#written by harsha
+if __name__ == '__main__':
+	try:
+		cList=recognise.shoot()
+	except:
+		speak("Sorry, error while recognising.")
+		print("Sorry, error while recognising.")
+		exit()
+		#cList=recognise.shoot()
+	for i in cList:
+		if "(2)" in i:
+			cList[cList.index(i)]=i.replace("(2)","")
+	if len(cList)==0:
+		speak("Sorry, Access Denied")
+		exit()
+	for i in cList:
+		speak("Hi"+i)
+	speak("Good to see you again. How can I help you?")
+	#wishMe()
+	p1 = Process(target = VA)
+	p1.start()
+	p2 = Process(target = call)
+	p2.start()
+	p1.join()
+	p2.join()
