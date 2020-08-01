@@ -99,7 +99,7 @@ def job():
 def call():
 	global ct
 	ct=0
-	schedule.every(1).minutes.do(job)
+	schedule.every(15).minutes.do(job)
 	while True:
 		schedule.run_pending()
 
